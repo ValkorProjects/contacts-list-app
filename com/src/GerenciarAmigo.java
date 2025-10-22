@@ -69,12 +69,12 @@ public class GerenciarAmigo{
         }
 
         StringBuilder sb = new StringBuilder();
-        sb.append("Lista de todos os amigos:").append(System.lineSeparator());
+        sb.append("Lista de todos os amigos:").append(System.lineSeparator()).append(System.lineSeparator());
 
         for (Amigo a : amigos) {
-            sb.append(a.imprimir()).append(System.lineSeparator());
+            sb.append(a.imprimir()).append(System.lineSeparator()).append(System.lineSeparator());
         }
 
-        return sb.toString();
+        return sb.toString().trim();
     }
 }

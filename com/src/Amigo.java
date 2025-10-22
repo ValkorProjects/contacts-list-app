@@ -22,7 +22,7 @@ public class Amigo {
         email = _email;
         dataNascimento = _dataNascimento;
     }
-    //Getters/Setters
+    //Comecar os getters e setters
     public void setName(String _name)                       
     {nome = _name;}
     public String getName()                                 
@@ -47,9 +47,18 @@ public class Amigo {
     public LocalDate getBirthdate()                         
     {return dataNascimento;}
 
+    // aBota endereço
+    public void setEndereco(Endereco e) {
+        endereco = e;
+    }
+    public Endereco getEndereco() {
+        return endereco;
+    }
+
     //Imprime todos os dados do usuário
     public String imprimir() {
-        String data = (dataNascimento == null) ? "N/A" : new java.text.SimpleDateFormat("dd/MM/yyyy").format(dataNascimento);
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+        String data = (dataNascimento == null) ? "N/A" : dataNascimento.format(formatter);
 
         StringBuilder sb = new StringBuilder();
         sb.append("Nome: ").append(nome == null ? "" : nome).append(System.lineSeparator());
@@ -76,10 +85,14 @@ public class Amigo {
                 hasAny = true;
             }
 
-            if (endereco.getAddressCity() != null && !endereco.getAddressState().isEmpty()) {
-                if(hasAny) sb.append("/");
-                sb.append(endereco.getAddressState());
+            if (endereco.getAddressCity() != null && !endereco.getAddressCity().isEmpty()) {
+                if (hasAny) sb.append(", ");
+                sb.append(endereco.getAddressCity());
                 hasAny = true;
+            }
+
+            if (endereco.getAddressState() != null && !endereco.getAddressState().isEmpty()) {
+                sb.append(" / ").append(endereco.getAddressState());
             }
 
             if (endereco.getAddressPostalCode() != null && !endereco.getAddressPostalCode().isEmpty()) {
