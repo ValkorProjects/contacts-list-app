@@ -1,13 +1,12 @@
    package com.src;
-   import java.util.*;
-   import javax.swing.JOptionPane;
-    public class Endereco {
+
+public class Endereco {
       private String enderecoRua;
       private String enderecoComplemento;
       private String enderecoCidade;
       private String enderecoEstado;
       private String enderecoCEP;
-      private String enderecoNumero;
+      private int enderecoNumero;
 
         
     public void setAddressStreet(String _street)            {enderecoRua = _street;}

@@ -1,39 +1,51 @@
 package com.src;
-import java.text.DateFormat;
-import java.time.Instant;
+import java.time.*;
 import java.time.format.DateTimeFormatter;
-import java.time.format.ResolverStyle;
-import java.util.*;
+import java.time.temporal.ChronoUnit;
 
 public class Amigo {
     //Dados pessoais
     private String nome;
+    private String email;
     private String numeroTelefone;
-    private Date dataNascimento;
-    private Endereco endereco;
+    private LocalDate dataNascimento;
+    private Endereco endereco; 
 
     public Amigo(){}
 
     public Amigo(String _nome, 
                 String _numeroTelefone, 
-                Date _dataNascimento){
+                String _email,
+                LocalDate _dataNascimento){
         nome = _nome;
         numeroTelefone = _numeroTelefone;
+        email = _email;
         dataNascimento = _dataNascimento;
     }
     //Getters/Setters
-    public void setName(String _name)                       {nome = _name;}
-    public String getName()                                 {return nome;}
+    public void setName(String _name)                       
+    {nome = _name;}
+    public String getName()                                 
+    {return nome;}
 
-    public void setPhoneNumber(String _number)              {numeroTelefone = _number;}
-    public String getPhoneNumber()                          {return numeroTelefone;}
+    public void setPhoneNumber(String _number)              
+    {numeroTelefone = _number;}
+    public String getPhoneNumber()                          
+    {return numeroTelefone;}
+    
+    public void setEmail(String _email)
+    {email = _email;}
+    public String getEmail()
+    {return email;}
 
-    public void setBirthdate(String _birthdate)             //DD/MM/YYYY             
+    public void setBirthdate(String _birthdate)                      
     {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyyy").withResolverStyle(ResolverStyle.STRICT);
-        dataNascimento = formatter.parse();  
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+        dataNascimento = LocalDate.parse(_birthdate, formatter);
+        System.out.println("dat nascimento: "+dataNascimento);
     }
-    public Date getBirthdate()                              {return dataNascimento;}
+    public LocalDate getBirthdate()                         
+    {return dataNascimento;}
 
     //Imprime todos os dados do usuário
     public String imprimir() {
@@ -42,23 +54,40 @@ public class Amigo {
         StringBuilder sb = new StringBuilder();
         sb.append("Nome: ").append(nome == null ? "" : nome).append(System.lineSeparator());
         sb.append("Telefone: ").append(numeroTelefone == null ? "" : numeroTelefone).append(System.lineSeparator());
+        sb.append("Email: ").append(email == null ? "" : email).append(System.lineSeparator());
         sb.append("Data de Nascimento: ").append(data).append(System.lineSeparator());
         sb.append("Endereço: ");
-        if (enderecoRua != null && !enderecoRua.isEmpty()) sb.append(enderecoRua);
-        if (enderecoNumero > 0) {
-            sb.append(", ").append(enderecoNumero);
-        }
-        if (enderecoComplemento != null && !enderecoComplemento.isEmpty()) { 
-            sb.append(", ").append(enderecoComplemento);
-        }
-        if (enderecoCidade != null && !enderecoCidade.isEmpty()) {
-            sb.append(", ").append(enderecoCidade);
-        }
-        if (enderecoEstado != null && !enderecoEstado.isEmpty()) {
-            sb.append("/").append(enderecoEstado);
-        }
-        if (enderecoCEP != null && !enderecoCEP.isEmpty()) {
-            sb.append(" CEP: ").append(enderecoCEP);
+        if (endereco != null) {
+            boolean hasAny = false;
+            if (endereco.getAddressStreet() != null && !endereco.getAddressStreet().isEmpty()) {
+                sb.append(endereco.getAddressStreet());
+                hasAny = true;
+            }
+
+            if (endereco.getAddressNumber() > 0) {
+                if (hasAny) sb.append(", ");
+                sb.append(endereco.getAddressNumber());
+                hasAny = true;
+            }
+
+            if (endereco.getAddresssComplement() != null && !endereco.getAddresssComplement().isEmpty()) {
+                if (hasAny) sb.append(", ");
+                sb.append(endereco.getAddresssComplement());
+                hasAny = true;
+            }
+
+            if (endereco.getAddressCity() != null && !endereco.getAddressState().isEmpty()) {
+                if(hasAny) sb.append("/");
+                sb.append(endereco.getAddressState());
+                hasAny = true;
+            }
+
+            if (endereco.getAddressPostalCode() != null && !endereco.getAddressPostalCode().isEmpty()) {
+                sb.append(" CEP: ").append(endereco.getAddressPostalCode());
+            }
+            if (!hasAny) sb.append("N/A");
+        } else {
+            sb.append("N/A");
         }
 
         return sb.toString();
@@ -67,8 +96,30 @@ public class Amigo {
     //Calcula dias para aniversariar 
     public int calcularDiasParaAniversariar()
     {
-        var dateNow = Date.from(Instant.now());
-        var daysTillBirthday = dateNow.compareTo(dataNascimento) * -1;
-        return daysTillBirthday;
+        if (dataNascimento == null) {
+            return -1;
+        }
+
+        LocalDate hoje = LocalDate.now();
+
+        MonthDay niverMesDia = MonthDay.from(dataNascimento);
+
+        LocalDate niverEsteAno = niverMesDia.atYear(hoje.getYear());
+
+        LocalDate proximoNiver;
+
+        if (niverEsteAno.isBefore(hoje)) {
+            proximoNiver = niverEsteAno.plusYears(1);
+        } else {
+            proximoNiver = niverEsteAno;
+        }
+
+        if (proximoNiver.isEqual(hoje)) {
+            return 0;
+        }
+
+        long dias = ChronoUnit.DAYS.between(hoje, proximoNiver);
+
+        return (int) dias;
     }
 }
