@@ -1,3 +1,8 @@
+/*  Guilherme Marques de Lima       - 248151
+    Luis Fillipe de Medeiros Silva  - 248370
+    Vittorio Pivarci                - 248674
+*/
+
 package com.src;
 import java.time.*;
 import java.time.format.DateTimeFormatter;

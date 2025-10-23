@@ -1,4 +1,9 @@
-   package com.src;
+/*  Guilherme Marques de Lima       - 248151
+    Luis Fillipe de Medeiros Silva  - 248370
+    Vittorio Pivarci                - 248674
+*/
+
+package com.src;
 
 public class Endereco {
       private String enderecoRua;

@@ -1,4 +1,7 @@
-
+/*  Guilherme Marques de Lima       - 248151
+    Luis Fillipe de Medeiros Silva  - 248370
+    Vittorio Pivarci                - 248674
+*/
 
 import com.src.Amigo;
 import com.src.Endereco;    
