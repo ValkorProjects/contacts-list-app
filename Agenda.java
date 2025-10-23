@@ -1,22 +1,28 @@
-package com.src;
 
-import javax.swing.JOptionPane;
+
+import com.src.Amigo;
+import com.src.Endereco;    
+import com.src.GerenciarAmigo;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
+import javax.swing.JOptionPane;
 
 public class Agenda {
     public static void main(String[] args) {
         String menu =
-            "=====================\n" +
-            "Menu de Opções\n" +
-            "=====================\n\n" +
-            "1 - Cadastrar Amigo na Agenda\n" +
-            "2 - Buscar Amigo pelo Nome\n" +
-            "3 - Aniversariantes no Mês\n" +
-            "4 - Listar todos os Amigos\n" +
-            "5 - Sair da Agenda\n\n" +
-            "Escolha uma opção (1-5):";
+            """
+            =====================
+            Menu de Op\u00e7\u00f5es
+            =====================
+            
+            1 - Cadastrar Amigo na Agenda
+            2 - Buscar Amigo pelo Nome
+            3 - Aniversariantes no M\u00eas
+            4 - Listar todos os Amigos
+            5 - Sair da Agenda
+            
+            Escolha uma op\u00e7\u00e3o (1-5):""";
 
         GerenciarAmigo manager = new GerenciarAmigo();
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
@@ -36,7 +42,7 @@ public class Agenda {
             }
 
             switch (option) {
-                case 1: {
+                case 1 ->  {
                     String nome = JOptionPane.showInputDialog("Nome:");
                     String telefone = JOptionPane.showInputDialog("Telefone:");
                     String email = JOptionPane.showInputDialog("Email:");
@@ -48,7 +54,6 @@ public class Agenda {
                         }
                     } catch (DateTimeParseException ex) {
                         JOptionPane.showMessageDialog(null, "Data inválida. Cadastro cancelado.");
-                        break;
                     }
 
                     // Endereço
@@ -81,36 +86,31 @@ public class Agenda {
 
                     String res = manager.cadastrarAmigo(a);
                     JOptionPane.showMessageDialog(null, res);
-                    break;
                 }
-                case 2: {
+                case 2 ->  {
                     String nome = JOptionPane.showInputDialog("Nome para buscar:");
                     String res = manager.buscarAmigoPeloNome(nome);
                     JOptionPane.showMessageDialog(null, res);
-                    break;
                 }
-                case 3: {
+                case 3 ->  {
                     String mesStr = JOptionPane.showInputDialog("Digite o mês (1-12):");
                     try {
                         int mes = Integer.parseInt(mesStr.trim());
                         String res = manager.aniversariarNoMes(mes);
                         JOptionPane.showMessageDialog(null, res);
                     } catch (Exception e) {
-                        JOptionPane.showMessageDialog(null, "Mês inválido.");
+                        JOptionPane.showMessageDialog(null, "Erro não tratado: " + e.getMessage());
                     }
-                    break;
                 }
-                case 4: {
+                case 4 ->  {
                     String res = manager.listarTodosAmigos();
                     JOptionPane.showMessageDialog(null, res);
-                    break;
                 }
-                case 5:
+                case 5 -> {
                     JOptionPane.showMessageDialog(null, "Saindo da Agenda...");
                     System.exit(0);
-                    break;
-                default:
-                    JOptionPane.showMessageDialog(null, "Opção inválida!");
+                }
+                default -> JOptionPane.showMessageDialog(null, "Opção inválida!");
             }
         }
     }
