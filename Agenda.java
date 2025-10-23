@@ -3,6 +3,7 @@
 import com.src.Amigo;
 import com.src.Endereco;    
 import com.src.GerenciarAmigo;
+import java.awt.HeadlessException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
@@ -93,13 +94,26 @@ public class Agenda {
                     JOptionPane.showMessageDialog(null, res);
                 }
                 case 3 ->  {
+                    //Loop until input data is correct. 
                     String mesStr = JOptionPane.showInputDialog("Digite o mês (1-12):");
-                    try {
-                        int mes = Integer.parseInt(mesStr.trim());
-                        String res = manager.aniversariarNoMes(mes);
-                        JOptionPane.showMessageDialog(null, res);
-                    } catch (Exception e) {
-                        JOptionPane.showMessageDialog(null, "Erro não tratado: " + e.getMessage());
+                    boolean isDataCorrect = false;
+                    while(!isDataCorrect && mesStr != null){
+                        try {
+                            mesStr = JOptionPane.showInputDialog("Digite o mês (1-12):");
+                            int mes = Integer.parseInt(mesStr.trim());
+                            String res = manager.aniversariarNoMes(mes);
+                            JOptionPane.showMessageDialog(null, res);
+                            isDataCorrect = true;
+                        }
+                        catch (NumberFormatException e){
+                            JOptionPane.showMessageDialog(null, "O número do mês é inválido");
+                        }
+                        catch (HeadlessException e){
+                            JOptionPane.showMessageDialog(null, "O dispositivo não fornece suporte à função requisitada. ");
+                        }
+                        catch (Exception e) {
+                            JOptionPane.showMessageDialog(null, e.getMessage());
+                        }
                     }
                 }
                 case 4 ->  {
