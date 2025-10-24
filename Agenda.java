@@ -3,13 +3,11 @@
     Vittorio Pivarci                - 248674
 */
 
-import com.src.Amigo;
-import com.src.Endereco;    
-import com.src.GerenciarAmigo;
+import com.src.*;
+import com.tools.Validate;
 import java.awt.HeadlessException;
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeParseException;
+import java.time.Year;
 import javax.swing.JOptionPane;
 
 public class Agenda {
@@ -29,7 +27,6 @@ public class Agenda {
             Escolha uma op\u00e7\u00e3o (1-5):""";
 
         GerenciarAmigo manager = new GerenciarAmigo();
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
         while (true) {
             String input = JOptionPane.showInputDialog(null, menu, "Menu", JOptionPane.QUESTION_MESSAGE);
@@ -47,19 +44,33 @@ public class Agenda {
 
             switch (option) {
                 case 1 ->  {
-                    String nome = JOptionPane.showInputDialog("Nome:");
-                    String telefone = JOptionPane.showInputDialog("Telefone:");
-                    String email = JOptionPane.showInputDialog("Email:");
-                    String dataStr = JOptionPane.showInputDialog("Data de nascimento (dd/MM/yyyy):");
-                    LocalDate data = null;
-                    try {
-                        if (dataStr != null && !dataStr.isBlank()) {
-                            data = LocalDate.parse(dataStr.trim(), formatter);
-                        }
-                    } catch (DateTimeParseException ex) {
-                        JOptionPane.showMessageDialog(null, "Data inválida. Cadastro cancelado.");
-                    }
+                    String nome = Validate.getValidatedInput("Nome:", 
+                    (string) -> {
+                        return string.length() < 50;
+                    }, 
+                    "O nome de usuário excede 50 caracteres.");
 
+                    String telefone = Validate.getValidatedInput("Telefone:", 
+                    (string) -> {
+                        return (string.length() <= 11 && string.length() >= 8);
+                    }, 
+                    "O numero de telefone excede 11 dígitos.");
+                    
+                    String email = Validate.getValidatedInput("Email:", 
+                    (string) -> {
+                        return ((string.endsWith("@gmail.com")      || 
+                                string.endsWith("@hotmail.com")     ||
+                                string.endsWith("@outlook.com"))    &&
+                                string.length() < 50);
+                    }, 
+                    "Email não termina no domínio correto ou muito longo.");
+                    
+                    LocalDate data = Validate.getValidatedDateInput("Data de nascimento (dd/MM/yyyy):", 
+                    (string) -> {
+                        return (string.length() <= 10 && !string.endsWith(Year.now().toString()));
+                    }, 
+                    "Data inválida."); 
+                    
                     // Endereço
                     String rua = JOptionPane.showInputDialog("Endereço - Rua:");
                     String numeroStr = JOptionPane.showInputDialog("Endereço - Número (deixe vazio se não houver):");
@@ -74,7 +85,11 @@ public class Agenda {
                     String complemento = JOptionPane.showInputDialog("Endereço - Complemento:");
                     String cidade = JOptionPane.showInputDialog("Endereço - Cidade:");
                     String estado = JOptionPane.showInputDialog("Endereço - Estado:");
-                    String cep = JOptionPane.showInputDialog("Endereço - CEP:");
+                    String cep = Validate.getValidatedInput("Endereço - CEP:", 
+                    (string) -> {
+                        return ((string.length() == 8) || (string.length() == 9 && string.contains("-")));
+                    }, 
+                    "CEP incorreto.");
 
                     Amigo a = new Amigo(nome, telefone, email, data);
 
