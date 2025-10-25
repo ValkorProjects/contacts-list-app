@@ -6,6 +6,7 @@
 package com.src;
 import java.time.*;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.time.temporal.ChronoUnit;
 
 public class Amigo {
@@ -25,7 +26,7 @@ public class Amigo {
         nome = _nome;
         numeroTelefone = _numeroTelefone;
         email = _email;
-        dataNascimento = _dataNascimento;
+        dataNascimento = _dataNascimento; 
     }
     //Comecar os getters e setters
     public void setName(String _name)                       
@@ -43,24 +44,35 @@ public class Amigo {
     public String getEmail()
     {return email;}
 
+    // seta data a partir de string (dd/MM/yyyy) com tratamento
     public void setBirthdate(String _birthdate)                      
     {
+        if (_birthdate == null || _birthdate.isBlank()) {
+            dataNascimento = null;
+            return;
+        }
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-        dataNascimento = LocalDate.parse(_birthdate, formatter);
-        System.out.println("dat nascimento: "+dataNascimento);
+        try {
+            dataNascimento = LocalDate.parse(_birthdate.trim(), formatter);
+        } catch (DateTimeParseException ex) {
+            // não sobrescrever se string inválida; define como null para indicar ausência
+            dataNascimento = null;
+        }
     }
+
+    // overload que aceita LocalDate diretamente
+    public void setBirthdate(LocalDate date) {
+        dataNascimento = date;
+    }
+
     public LocalDate getBirthdate()                         
     {return dataNascimento;}
 
     // aBota endereço
-    public void setEndereco(Endereco e) {
-        endereco = e;
-    }
-    public Endereco getEndereco() {
-        return endereco;
-    }
+    public void setEndereco(Endereco e) {endereco = e;}
+    public Endereco getEndereco() {return endereco;}
 
-    //Imprime todos os dados do usuário
+    //Imprime todos os dados do usuário (apenas uma linha "Data de Nascimento")
     public String imprimir() {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
         String data = (dataNascimento == null) ? "N/A" : dataNascimento.format(formatter);
@@ -111,7 +123,7 @@ public class Amigo {
         return sb.toString();
     }
 
-    //Calcula dias para aniversariar 
+    //Calcula dias para aniversariar (robusto para 29/02)
     public int calcularDiasParaAniversariar()
     {
         if (dataNascimento == null) {
@@ -119,25 +131,34 @@ public class Amigo {
         }
 
         LocalDate hoje = LocalDate.now();
+        MonthDay md = MonthDay.from(dataNascimento);
 
-        MonthDay niverMesDia = MonthDay.from(dataNascimento);
-
-        LocalDate niverEsteAno = niverMesDia.atYear(hoje.getYear());
-
-        LocalDate proximoNiver;
-
-        if (niverEsteAno.isBefore(hoje)) {
-            proximoNiver = niverEsteAno.plusYears(1);
-        } else {
-            proximoNiver = niverEsteAno;
+        // tenta encontrar o próximo aniversário em até 5 anos (cuida do 29/02)
+        LocalDate proximo = null;
+        for (int add = 0; add <= 5; add++) {
+            int year = hoje.getYear() + add;
+            try {
+                LocalDate candidate = md.atYear(year);
+                if (!candidate.isBefore(hoje)) {
+                    proximo = candidate;
+                    break;
+                }
+            } catch (DateTimeException ex) {
+                // pular ano inválido (ex: 29/02 em ano não-bissexto)
+                continue;
+            }
         }
 
-        if (proximoNiver.isEqual(hoje)) {
-            return 0;
+        if (proximo == null) {
+            // fallback: ajustar para 28/02
+            MonthDay fallback = MonthDay.of(md.getMonthValue(), Math.min(md.getDayOfMonth(), 28));
+            proximo = fallback.atYear(hoje.getYear());
+            if (proximo.isBefore(hoje)) proximo = proximo.plusYears(1);
         }
 
-        long dias = ChronoUnit.DAYS.between(hoje, proximoNiver);
+        if (proximo.isEqual(hoje)) return 0;
 
+        long dias = ChronoUnit.DAYS.between(hoje, proximo);
         return (int) dias;
     }
 }

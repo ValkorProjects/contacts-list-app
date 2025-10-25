@@ -85,11 +85,17 @@ public class Agenda {
                     String complemento = JOptionPane.showInputDialog("Endereço - Complemento:");
                     String cidade = JOptionPane.showInputDialog("Endereço - Cidade:");
                     String estado = JOptionPane.showInputDialog("Endereço - Estado:");
-                    String cep = Validate.getValidatedInput("Endereço - CEP:", 
+                    String cep = Validate.getValidatedInput("Endereço - CEP (ex: 12345-678 ou 12345678):", 
                     (string) -> {
-                        return ((string.length() == 8) || (string.length() == 9 && string.contains("-")));
-                    }, 
-                    "CEP incorreto.");
+                        if (string == null) return false;
+                        return string.matches("^\\d{5}-?\\d{3}$");
+                    },
+                    "CEP incorreto. Use 12345-678 ou 12345678."); 
+
+                    // normaliza para somente dígitos antes de salvar
+                    if (cep != null) {
+                        cep = cep.replaceAll("\\D", "");
+                    }
 
                     Amigo a = new Amigo(nome, telefone, email, data);
 
@@ -100,7 +106,6 @@ public class Agenda {
                     end.setAddressCity(cidade);
                     end.setAddressState(estado);
                     end.setAddressPostalCode(cep);
-
                     a.setEndereco(end); // Junta endereço com amigo
 
                     String res = manager.cadastrarAmigo(a);
@@ -112,26 +117,33 @@ public class Agenda {
                     JOptionPane.showMessageDialog(null, res);
                 }
                 case 3 ->  {
-                    //Loop until input data is correct. 
-                    String mesStr = JOptionPane.showInputDialog("Digite o mês (1-12):");
-                    boolean isDataCorrect = false;
-                    while(!isDataCorrect && mesStr != null){
+                    boolean done = false;
+                    while (!done) {
+                        String mesStr = JOptionPane.showInputDialog(null, "Digite o mês (1-12):");
+                        if (mesStr == null) break; // usuário cancelou
+
+                        mesStr = mesStr.trim();
+                        if (mesStr.isEmpty()) {
+                            JOptionPane.showMessageDialog(null, "Entrada vazia. Digite um número entre 1 e 12.");
+                            continue;
+                        }
+
+                        int mes;
                         try {
-                            mesStr = JOptionPane.showInputDialog("Digite o mês (1-12):");
-                            int mes = Integer.parseInt(mesStr.trim());
-                            String res = manager.aniversariarNoMes(mes);
-                            JOptionPane.showMessageDialog(null, res);
-                            isDataCorrect = true;
+                            mes = Integer.parseInt(mesStr);
+                        } catch (NumberFormatException ex) {
+                            JOptionPane.showMessageDialog(null, "Mês inválido. Digite um número entre 1 e 12.");
+                            continue;
                         }
-                        catch (NumberFormatException e){
-                            JOptionPane.showMessageDialog(null, "O número do mês é inválido");
+
+                        if (mes < 1 || mes > 12) {
+                            JOptionPane.showMessageDialog(null, "Mês fora do intervalo. Digite um número entre 1 e 12.");
+                            continue;
                         }
-                        catch (HeadlessException e){
-                            JOptionPane.showMessageDialog(null, "O dispositivo não fornece suporte à função requisitada. ");
-                        }
-                        catch (Exception e) {
-                            JOptionPane.showMessageDialog(null, e.getMessage());
-                        }   
+
+                        String res = manager.aniversariarNoMes(mes);
+                        JOptionPane.showMessageDialog(null, res);
+                        done = true;
                     }
                 }
                 case 4 ->  {

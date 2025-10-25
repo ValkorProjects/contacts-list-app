@@ -4,12 +4,11 @@
 */
 
 package com.src;
-import java.time.*;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
 
-public class GerenciarAmigo{
+import java.time.LocalDate;
+import java.util.ArrayList;
+
+public class GerenciarAmigo {
     private final ArrayList<Amigo> amigos = new ArrayList<>();
 
     // Cadastra um amigo e retorna confirmação de cadastro
@@ -23,23 +22,23 @@ public class GerenciarAmigo{
     public String buscarAmigoPeloNome(String nome) {
         if (nome == null || nome.isBlank()) return "Nome inválido.";
         for (Amigo a : amigos) {
-            if(a.getName() != null && a.getName().equalsIgnoreCase(nome.trim())) {
+            if (a.getName() != null && a.getName().equalsIgnoreCase(nome.trim())) {
                 StringBuilder sb = new StringBuilder();
                 sb.append(a.imprimir()).append(System.lineSeparator());
-                LocalDate bd = a.getBirthdate();
-                if (bd == null) {
-                    sb.append("Data de nascimento: N/A").append(System.lineSeparator());
+
+                int dias = a.calcularDiasParaAniversariar();
+                if (dias == -1) {
+                    sb.append("Dias para aniversário: N/A").append(System.lineSeparator());
+                } else if (dias == 0) {
+                    sb.append("Aniversário hoje!").append(System.lineSeparator());
                 } else {
-                    int dias = a.calcularDiasParaAniversariar();
-                    if (dias == 0) {sb.append("Aniversario hoje!");
-                    } else {
-                        sb.append("Faltam ").append(dias).append(" dia(s) para o aniversário.");
-                    }
+                    sb.append("Faltam ").append(dias).append(" dia(s) para o aniversário.").append(System.lineSeparator());
                 }
+
                 return sb.toString();
             }
         }
-        return "Amigo não encontrado" ;
+        return "Amigo não encontrado";
     }
 
     // Retorna lista de amigos que fazem aniversario no mês informado
@@ -49,20 +48,14 @@ public class GerenciarAmigo{
         }
 
         StringBuilder sb = new StringBuilder();
-        Calendar cal = Calendar.getInstance();
-
         for (Amigo a : amigos) {
-            if (a.getBirthdate() != null) {
-                Date d = Date.from(a.getBirthdate().atStartOfDay(ZoneId.systemDefault()).toInstant());
-                if ((cal.get(Calendar.MONTH) + 1) == mes) {
-                    if (sb.length() > 0) {
-                        sb.append(", ");
-                    }
-                    sb.append(a.getName());
-                }
+            LocalDate bd = a.getBirthdate();
+            if (bd != null && bd.getMonthValue() == mes) {
+                if (sb.length() > 0) sb.append(", ");
+                sb.append(a.getName() == null ? "Nome desconhecido" : a.getName());
             }
         }
-        return sb.length() > 0 ? 
+        return sb.length() > 0 ?
             "Amigos que fazem aniversário no mês " + mes + ": " + sb.toString() :
             "Nenhum amigo faz aniversário no mês " + mes;
     }
@@ -76,8 +69,28 @@ public class GerenciarAmigo{
         StringBuilder sb = new StringBuilder();
         sb.append("Lista de todos os amigos:").append(System.lineSeparator()).append(System.lineSeparator());
 
+        int idx = 0;
         for (Amigo a : amigos) {
-            sb.append(a.imprimir()).append(System.lineSeparator()).append(System.lineSeparator());
+            idx++;
+            try {
+                sb.append(a.imprimir()).append(System.lineSeparator());
+
+                int dias = a.calcularDiasParaAniversariar();
+                if (dias == -1) {
+                    sb.append("Dias para aniversário: N/A").append(System.lineSeparator());
+                } else if (dias == 0) {
+                    sb.append("Aniversário hoje!").append(System.lineSeparator());
+                } else {
+                    sb.append("Faltam ").append(dias).append(" dia(s) para o aniversário.").append(System.lineSeparator());
+                }
+
+                sb.append(System.lineSeparator()); // linha em branco entre amigos
+            } catch (Exception ex) {
+                sb.append("Erro ao imprimir amigo #").append(idx)
+                  .append(": ").append(ex.getClass().getSimpleName())
+                  .append(" - ").append(ex.getMessage())
+                  .append(System.lineSeparator()).append(System.lineSeparator());
+            }
         }
 
         return sb.toString().trim();
