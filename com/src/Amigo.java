@@ -145,7 +145,6 @@ public class Amigo {
                 }
             } catch (DateTimeException ex) {
                 // pular ano inválido (ex: 29/02 em ano não-bissexto)
-                continue;
             }
         }
 

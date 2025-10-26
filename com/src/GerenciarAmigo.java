@@ -27,12 +27,16 @@ public class GerenciarAmigo {
                 sb.append(a.imprimir()).append(System.lineSeparator());
 
                 int dias = a.calcularDiasParaAniversariar();
-                if (dias == -1) {
-                    sb.append("Dias para aniversário: N/A").append(System.lineSeparator());
-                } else if (dias == 0) {
-                    sb.append("Aniversário hoje!").append(System.lineSeparator());
-                } else {
-                    sb.append("Faltam ").append(dias).append(" dia(s) para o aniversário.").append(System.lineSeparator());
+                switch(dias){
+                    case -1 -> {
+                        sb.append("Dias para aniversário: N/A").append(System.lineSeparator());
+                    }
+                    case 0 -> {
+                        sb.append("Aniversário hoje!").append(System.lineSeparator());
+                    }
+                    default -> {
+                        sb.append("Faltam ").append(dias).append(" dia(s) para o aniversário.").append(System.lineSeparator());
+                    }
                 }
 
                 return sb.toString();
@@ -76,12 +80,16 @@ public class GerenciarAmigo {
                 sb.append(a.imprimir()).append(System.lineSeparator());
 
                 int dias = a.calcularDiasParaAniversariar();
-                if (dias == -1) {
-                    sb.append("Dias para aniversário: N/A").append(System.lineSeparator());
-                } else if (dias == 0) {
-                    sb.append("Aniversário hoje!").append(System.lineSeparator());
-                } else {
-                    sb.append("Faltam ").append(dias).append(" dia(s) para o aniversário.").append(System.lineSeparator());
+                switch(dias){
+                    case -1 -> {
+                        sb.append("Dias para aniversário: N/A").append(System.lineSeparator());
+                    }
+                    case 0 -> {
+                        sb.append("Aniversário hoje!").append(System.lineSeparator());
+                    }
+                    default -> {
+                        sb.append("Faltam ").append(dias).append(" dia(s) para o aniversário.").append(System.lineSeparator());
+                    }
                 }
 
                 sb.append(System.lineSeparator()); // linha em branco entre amigos
