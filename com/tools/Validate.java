@@ -1,3 +1,14 @@
+/*  
+    PROJECT MADE BY:
+    -----
+    Guilherme Marques de Lima       - 248151
+    Luis Fillipe de Medeiros Silva  - 248370
+    Vittorio Pivarci                - 248674
+
+    
+    GITHUB: https://github.com/ValkorProjects/contacts-list-app
+*/
+
 package com.tools;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -14,6 +25,34 @@ public class Validate
             String input = JOptionPane.showInputDialog(prompt);
             if(input == null) return null;
             if(validator.test(input)) return input;
+
+            //In case of error
+            JOptionPane.showOptionDialog(null, 
+                errorMessage, 
+                "Erro", 
+                JOptionPane.ERROR_MESSAGE, 
+                JOptionPane.ERROR_MESSAGE, 
+                null, 
+                error_options, 
+                error_options[0]
+            );
+        }
+    }
+
+    public static Object getValidatedInputConvert(String targetClass, String prompt, Predicate<String> validator, String errorMessage)
+    {
+        Object[] error_options = {"OK"};
+        while (true) { 
+            String input = JOptionPane.showInputDialog(prompt);
+            if(input == null) return null;
+            if(validator.test(input)){
+                return switch (targetClass.toUpperCase()) {
+                    case "INTEGER" -> Integer.valueOf(input);
+                    case "FLOAT" -> Float.valueOf(input);
+                    case "DOUBLE" -> Double.valueOf(input);
+                    default -> input;
+                };
+            }
 
             //In case of error
             JOptionPane.showOptionDialog(null, 

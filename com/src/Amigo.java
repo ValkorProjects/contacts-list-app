@@ -1,7 +1,14 @@
-/*  Guilherme Marques de Lima       - 248151
+/*  
+    PROJECT MADE BY:
+    -----
+    Guilherme Marques de Lima       - 248151
     Luis Fillipe de Medeiros Silva  - 248370
     Vittorio Pivarci                - 248674
+
+    
+    GITHUB: https://github.com/ValkorProjects/contacts-list-app
 */
+
 
 package com.src;
 import java.time.*;

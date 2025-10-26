@@ -1,9 +1,16 @@
-/*  Guilherme Marques de Lima       - 248151
+/*  
+    PROJECT MADE BY:
+    -----
+    Guilherme Marques de Lima       - 248151
     Luis Fillipe de Medeiros Silva  - 248370
     Vittorio Pivarci                - 248674
+
+    
+    GITHUB: https://github.com/ValkorProjects/contacts-list-app
 */
 
 import com.src.*;
+import com.tools.StringAnalyzer;
 import com.tools.Validate;
 import java.time.LocalDate;
 import java.time.Year;
@@ -70,20 +77,40 @@ public class Agenda {
                     }, 
                     "Data inválida."); 
                     
+                    //###########
                     // Endereço
+                    //? For address NAMES, ensure the user cannot input numbers
+                    //###########
                     String rua = JOptionPane.showInputDialog("Endereço - Rua:");
-                    String numeroStr = JOptionPane.showInputDialog("Endereço - Número (deixe vazio se não houver):");
-                    int numero = 0;
-                    try {
-                        if (numeroStr != null && !numeroStr.isBlank()) {
-                            numero = Integer.parseInt(numeroStr.trim());
+                    int numero = (int)Validate.getValidatedInputConvert("INTEGER",
+                    "Endereço - Número (deixe vazio se não houver):", 
+                    (_int) -> {
+                        try {
+                            if (_int != null && !_int.isBlank()) {
+                                Integer.valueOf(_int.trim());
+                                return true;
+                            }
+                            else return false;
+                        } catch (NumberFormatException ex) {
+                            return false;
                         }
-                    } catch (NumberFormatException ex) {
-                        numero = 0;
-                    }
-                    String complemento = JOptionPane.showInputDialog("Endereço - Complemento:");
-                    String cidade = JOptionPane.showInputDialog("Endereço - Cidade:");
-                    String estado = JOptionPane.showInputDialog("Endereço - Estado:");
+                    }, 
+                    "O valor digitado não é válido.");
+                    
+                    String complemento = JOptionPane.showInputDialog("Endereço - Estado:");
+
+                    String cidade = Validate.getValidatedInput("Endereço - Cidade:", 
+                    (string) -> {
+                        return (StringAnalyzer.countConditionOccurences(string, (ch) -> {return (ch >= '0' && ch <= '9');}) > 0);
+                    }, 
+                    "O nome da cidade não deve conter números.");
+
+                    String estado = Validate.getValidatedInput("Endereço - Estado:", 
+                    (string) -> {
+                        return (StringAnalyzer.countConditionOccurences(string, (ch) -> {return (ch >= '0' && ch <= '9');}) > 0);
+                    }, 
+                    "O nome da estado não deve conter números.");
+
                     String cep = Validate.getValidatedInput("Endereço - CEP (ex: 12345-678 ou 12345678):", 
                     (string) -> {
                         if (string == null) return false;
