@@ -10,6 +10,9 @@
 */
 
 package com.tools;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.function.IntPredicate;
 
 public class StringAnalyzer {
@@ -48,5 +51,43 @@ public class StringAnalyzer {
             else count++;
         }
         return count;
+    }
+
+    public static LocalDate parseDateAnyFormat(String input){
+
+        //Date formats
+        DateTimeFormatter[] fmts = new DateTimeFormatter[] {
+            DateTimeFormatter.ofPattern("dd/MM/yyyy"),
+            DateTimeFormatter.ofPattern("d/M/yyyy"),
+            DateTimeFormatter.ofPattern("dd-MM-yyyy"),
+            DateTimeFormatter.ofPattern("d-M-yyyy"),
+            DateTimeFormatter.ofPattern("yyyy-MM-dd")
+        };
+
+        int dashCount = countCharOccurences(input, '-');
+        int slashCount = countCharOccurences(input, '/');
+
+        if(dashCount == 2 || slashCount == 2){
+            for(DateTimeFormatter f : fmts){
+                try {
+                    return LocalDate.parse(input, f);
+                } catch (DateTimeParseException e){
+                    break;
+                }
+            }
+        }
+        else if(dashCount < 2 && slashCount < 2){
+            String digits = input.replaceAll("\\/", "").replaceAll("\\-", "");
+            try {
+                if(digits.length() == 8){
+                    return LocalDate.parse(digits, DateTimeFormatter.ofPattern("ddMMyyyy"));
+                }
+                else if(digits.length() == 6){
+                    return LocalDate.parse(digits, DateTimeFormatter.ofPattern("ddMMyy"));
+                }
+            } catch (DateTimeParseException e) {}
+        }
+
+        return null;
     }
 }

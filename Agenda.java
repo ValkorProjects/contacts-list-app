@@ -36,11 +36,12 @@ public class Agenda {
 
         while (true) {
             String input = JOptionPane.showInputDialog(null, menu, "Menu", JOptionPane.QUESTION_MESSAGE);
+            int option;
+            
             if (input == null) { // user canceled
                 continue;
             }
 
-            int option;
             try {
                 option = Integer.parseInt(input.trim());
             } catch (NumberFormatException e) {
@@ -49,18 +50,21 @@ public class Agenda {
             }
 
             switch (option) {
+                //Cadastrar Amigo na Agenda
                 case 1 ->  {
                     String nome = Validate.getValidatedInput("Nome:", 
                     (string) -> {
                         return string.length() < 50;
                     }, 
-                    "O nome de usuário excede 50 caracteres.");
+                    "O nome de usuário excede 50 caracteres.",
+                    false);
 
                     String telefone = Validate.getValidatedInput("Telefone:", 
                     (string) -> {
                         return (string.length() <= 11 && string.length() >= 8);
                     }, 
-                    "O numero de telefone excede 11 dígitos.");
+                    "O numero de telefone excede 11 dígitos.",
+                    false);
                     
                     String email = Validate.getValidatedInput("Email:", 
                     (string) -> {
@@ -69,24 +73,38 @@ public class Agenda {
                                 string.endsWith("@outlook.com"))    &&
                                 string.length() < 50);
                     }, 
-                    "Email não termina no domínio correto ou muito longo.");
+                    "Email não termina no domínio correto ou muito longo.",
+                    false);
                     
                     LocalDate data = Validate.getValidatedDateInput("Data de nascimento (dd/MM/yyyy):", 
                     (string) -> {
+                        if (string == null) return false;
                         return (string.length() <= 10 && !string.endsWith(Year.now().toString()));
                     }, 
-                    "Data inválida."); 
+                    "Data inválida.",
+                    false); 
                     
                     //###########
                     // Endereço
                     //? For address NAMES, ensure the user cannot input numbers
                     //###########
-                    String rua = JOptionPane.showInputDialog("Endereço - Rua:");
+                    String rua = Validate.getValidatedInput("Endereço - Rua:", 
+                    (string) -> {
+                        return (StringAnalyzer.countConditionOccurences(string, (ch) -> {return (ch >= '0' && ch <= '9');}) <= 0);
+                    }, 
+                    "O nome da rua não deve conter números.",
+                    false);
+
                     int numero = (int)Validate.getValidatedInputConvert("INTEGER",
                     "Endereço - Número (deixe vazio se não houver):", 
                     (_int) -> {
+                        if(_int == null)
+                        {
+                            return false;
+                        }
+
                         try {
-                            if (_int != null && !_int.isBlank()) {
+                            if (!_int.isBlank()) {
                                 Integer.valueOf(_int.trim());
                                 return true;
                             }
@@ -95,28 +113,32 @@ public class Agenda {
                             return false;
                         }
                     }, 
-                    "O valor digitado não é válido.");
+                    "O valor digitado não é válido.",
+                    true);
                     
-                    String complemento = JOptionPane.showInputDialog("Endereço - Estado:");
+                    String complemento = JOptionPane.showInputDialog("Endereço - Complemento:");
 
                     String cidade = Validate.getValidatedInput("Endereço - Cidade:", 
                     (string) -> {
-                        return (StringAnalyzer.countConditionOccurences(string, (ch) -> {return (ch >= '0' && ch <= '9');}) > 0);
+                        return (StringAnalyzer.countConditionOccurences(string, (ch) -> {return (ch >= '0' && ch <= '9');}) <= 0);
                     }, 
-                    "O nome da cidade não deve conter números.");
+                    "O nome da cidade não deve conter números.",
+                    false);
 
                     String estado = Validate.getValidatedInput("Endereço - Estado:", 
                     (string) -> {
-                        return (StringAnalyzer.countConditionOccurences(string, (ch) -> {return (ch >= '0' && ch <= '9');}) > 0);
+                        return (StringAnalyzer.countConditionOccurences(string, (ch) -> {return (ch >= '0' && ch <= '9');}) <= 0);
                     }, 
-                    "O nome da estado não deve conter números.");
+                    "O nome da estado não deve conter números.",
+                    false);
 
                     String cep = Validate.getValidatedInput("Endereço - CEP (ex: 12345-678 ou 12345678):", 
                     (string) -> {
                         if (string == null) return false;
                         return string.matches("^\\d{5}-?\\d{3}$");
                     },
-                    "CEP incorreto. Use 12345-678 ou 12345678."); 
+                    "CEP incorreto. Use 12345-678 ou 12345678.",
+                    false); 
 
                     // normaliza para somente dígitos antes de salvar
                     if (cep != null) {
@@ -137,11 +159,13 @@ public class Agenda {
                     String res = manager.cadastrarAmigo(a);
                     JOptionPane.showMessageDialog(null, res);
                 }
+                //Buscar Amigo pelo Nome
                 case 2 ->  {
                     String nome = JOptionPane.showInputDialog("Nome para buscar:");
                     String res = manager.buscarAmigoPeloNome(nome);
                     JOptionPane.showMessageDialog(null, res);
                 }
+                //Aniversariantes no Mes
                 case 3 ->  {
                     boolean done = false;
                     while (!done) {
@@ -172,10 +196,12 @@ public class Agenda {
                         done = true;
                     }
                 }
+                //Listar todos os Amigos
                 case 4 ->  {
                     String res = manager.listarTodosAmigos();
                     JOptionPane.showMessageDialog(null, res);
                 }
+                //Sair
                 case 5 -> {
                     JOptionPane.showMessageDialog(null, "Saindo da Agenda...");
                     System.exit(0);

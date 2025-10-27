@@ -28,3 +28,5 @@ The user must input one of the following 5 numbers into the input field in order
 3. *"Aniversariantes do mês":* displays friends whose birthdays are due in the current month.
 4. *"Listar todos os amigos":* displays a list cotaining all of user's friends.
 5. *"Sair da agenda":* Exits the application.
+
+This project also includes some pretty handy tools for manipulating strings and validating inputs.
