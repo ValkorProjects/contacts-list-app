@@ -11,6 +11,7 @@
 
 import com.src.*;
 import java.time.LocalDate;
+import java.time.DateTimeException;
 import javax.swing.JOptionPane;
 import java.util.regex.Pattern;
 
@@ -21,6 +22,41 @@ public class Agenda {
 
     private static boolean isAllowedText(String s) {
         return s != null && !s.isBlank() && ALLOWED_TEXT.matcher(s).matches();
+    }
+
+    // parse simples para dd/MM/yyyy, dd-MM-yyyy ou ddMMyyyy
+    private static LocalDate parseFlexibleDate(String input) {
+        if (input == null) return null;
+        String s = input.trim();
+        if (s.isEmpty()) return null;
+
+        // formato com separador / ou -
+        if (s.matches("^\\d{2}[/-]\\d{2}[/-]\\d{4}$")) {
+            String[] parts = s.split("[/-]");
+            try {
+                int d = Integer.parseInt(parts[0]);
+                int m = Integer.parseInt(parts[1]);
+                int y = Integer.parseInt(parts[2]);
+                return LocalDate.of(y, m, d);
+            } catch (DateTimeException | NumberFormatException ex) {
+                return null;
+            }
+        }
+
+        // formato sem separador ddMMyyyy
+        String digits = s.replaceAll("\\D", "");
+        if (digits.matches("^\\d{8}$")) {
+            try {
+                int d = Integer.parseInt(digits.substring(0, 2));
+                int m = Integer.parseInt(digits.substring(2, 4));
+                int y = Integer.parseInt(digits.substring(4, 8));
+                return LocalDate.of(y, m, d);
+            } catch (DateTimeException | NumberFormatException ex) {
+                return null;
+            }
+        }
+
+        return null;
     }
 
     public static void main(String[] args) {
@@ -43,7 +79,7 @@ public class Agenda {
         while (true) {
             String input = JOptionPane.showInputDialog(null, menu, "Menu", JOptionPane.QUESTION_MESSAGE);
             int option;
-            
+
             if (input == null) { // user canceled
                 continue;
             }
@@ -116,33 +152,34 @@ public class Agenda {
                     }
                     if (email == null) break;
 
-                    // Data de nascimento (OBRIGATÓRIA)
+                    // Data de nascimento (OBRIGATÓRIA) — aceita dd/MM/yyyy, dd-MM-yyyy e ddMMyyyy
                     boolean cancelRegistration = false;
-                    java.time.format.DateTimeFormatter formatter = java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy");
                     LocalDate data = null;
                     while (true) {
-                        String dataStr = JOptionPane.showInputDialog(null, "Data de nascimento (dd/MM/yyyy): ");
+                        String dataStr = JOptionPane.showInputDialog(null, "Data de nascimento (dd/MM/yyyy, dd-MM-yyyy ou ddMMyyyy):");
                         if (dataStr == null) { JOptionPane.showMessageDialog(null, "Cadastro cancelado."); cancelRegistration = true; break; }
                         dataStr = dataStr.trim();
                         if (dataStr.isEmpty()) {
-                            JOptionPane.showMessageDialog(null, "Data de nascimento obrigatória. Digite no formato dd/MM/yyyy.");
+                            JOptionPane.showMessageDialog(null, "Data de nascimento obrigatória. Digite no formato solicitado.");
                             continue;
                         }
-                        try {
-                            LocalDate parsed = LocalDate.parse(dataStr, formatter);
-                            if (parsed.isAfter(LocalDate.now())) {
-                                JOptionPane.showMessageDialog(null, "Data no futuro. Digite uma data válida.");
-                                continue;
-                            }
-                            if (parsed.isBefore(LocalDate.of(1900, 1, 1))) {
-                                JOptionPane.showMessageDialog(null, "Data muito antiga. Digite uma data válida.");
-                                continue;
-                            }
-                            data = parsed;
-                            break;
-                        } catch (java.time.format.DateTimeParseException ex) {
-                            JOptionPane.showMessageDialog(null, "Formato inválido. Use dd/MM/yyyy.");
+
+                        LocalDate parsed = parseFlexibleDate(dataStr);
+                        if (parsed == null) {
+                            JOptionPane.showMessageDialog(null, "Formato inválido ou data inválida. Use dd/MM/yyyy, dd-MM-yyyy ou ddMMyyyy.");
+                            continue;
                         }
+                        if (parsed.isAfter(LocalDate.now())) {
+                            JOptionPane.showMessageDialog(null, "Data no futuro. Digite uma data válida.");
+                            continue;
+                        }
+                        if (parsed.isBefore(LocalDate.of(1900, 1, 1))) {
+                            JOptionPane.showMessageDialog(null, "Data muito antiga. Digite uma data válida.");
+                            continue;
+                        }
+
+                        data = parsed;
+                        break;
                     }
                     if (cancelRegistration) break;
 
